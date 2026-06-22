@@ -1,6 +1,6 @@
 # CipherEntropy
 
-![CipherEntropy Logo](img/logo.png)
+![CipherEntropy Logo](img/frieren_ascii.png)
 
 ## Project Overview
 
