@@ -129,7 +129,7 @@ def run(conf):
         algorithms =  [conf["algo"]]
     experiment_id = 1
     
-    """for algorithm in algorithms:
+    for algorithm in algorithms:
         for loop_id in range(conf["loops"]):
             for file_path in files_:
                 result = run_once(
@@ -157,7 +157,7 @@ def run(conf):
                     result["key"].hex(),
                     "" if result["iv"] is None else result["iv"].hex()
                ])
-                experiment_id +=1"""
+                experiment_id +=1
     plots = PlotGenerator(
         csv_file="data/csv/global.csv",
         output_dir=conf["savedPlot"]

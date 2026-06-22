@@ -26,8 +26,9 @@ class PlotGenerator:
 
         self.df = pl.read_csv(self.csv_file)
 
-
-        self.pdf = self.df.to_pandas()
+        self.pdf = self.df.to_dicts()
+       
+        self.pdf = pd.DataFrame(self.df.to_dicts())
     def entropy_histogram(self):
         plt.figure(figsize=(10, 6))
         ax = sns.histplot(
