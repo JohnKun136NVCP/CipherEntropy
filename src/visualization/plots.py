@@ -1,5 +1,4 @@
 from pathlib import Path
-import polars as pl
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -24,11 +23,11 @@ class PlotGenerator:
             exist_ok=True
         )
 
-        self.df = pl.read_csv(self.csv_file)
+        self.df = pd.read_csv(self.csv_file)
 
-        self.pdf = self.df.to_dicts()
+
+        self.pdf = self.df.copy()
        
-        self.pdf = pd.DataFrame(self.df.to_dicts())
     def entropy_histogram(self):
         plt.figure(figsize=(10, 6))
         ax = sns.histplot(
@@ -69,7 +68,6 @@ class PlotGenerator:
         sns.histplot(
             data=self.pdf,
             x="entropy_delta",
-            hue="algorithm",
             kde=True,
             bins=30
         )
@@ -139,7 +137,7 @@ class PlotGenerator:
             data=self.pdf,
             x="entropy_raw",
             y="entropy_encrypted",
-            hue="algorithm"
+
         )
 
         plt.title(
@@ -159,31 +157,25 @@ class PlotGenerator:
 
         stats = (
             self.df
-            .group_by("algorithm")
-            .agg([
-                pl.mean("entropy_raw")
-                    .alias("mean_raw"),
-
-                pl.mean("entropy_encrypted")
-                    .alias("mean_encrypted"),
-
-                pl.std("entropy_encrypted")
-                    .alias("std_encrypted"),
-
-                pl.mean("encrypt_time_ms")
-                    .alias("mean_encrypt_ms"),
-
-                pl.mean("decrypt_time_ms")
-                    .alias("mean_decrypt_ms")
-            ])
+            .groupby("algorithm")
+            .agg(
+                mean_raw=("entropy_raw", "mean"),
+                mean_encrypted=("entropy_encrypted", "mean"),
+                std_encrypted=("entropy_encrypted", "std"),
+                mean_encrypt_ms=("encrypt_time_ms", "mean"),
+                mean_decrypt_ms=("decrypt_time_ms", "mean")
+            )
+            .reset_index()
         )
 
-        stats.write_csv(
+        stats.to_csv(
             self.output_dir /
-            "descriptive_statistics.csv"
+            "descriptive_statistics.csv",
+            index=False
         )
 
         return stats
+
     def wilcoxon_test(self):
 
         stat, pvalue = wilcoxon(
@@ -233,7 +225,6 @@ class PlotGenerator:
             data=df,
             x="run_id",
             y="entropy_encrypted",
-            hue="algorithm",
             label="Experimental"
         )
 
@@ -290,7 +281,6 @@ class PlotGenerator:
         sns.histplot(
             data=df,
             x="closeness",
-            hue="algorithm",
             kde=True
         )
 
@@ -316,7 +306,6 @@ class PlotGenerator:
             data=df,
             x="entropy_encrypted",
             y="theoretical",
-            hue="algorithm"
         )
 
         plt.axvline(8.0, linestyle="--", color="black")
@@ -371,7 +360,7 @@ class PlotGenerator:
             data=self.pdf, 
             x="algorithm", 
             y="entropy_encrypted",
-            hue="algorithm",        # Add this
+            color="black",        # Add this
             palette="colorblind",
             legend=False            # Add this
         )
@@ -380,8 +369,7 @@ class PlotGenerator:
         sns.stripplot(
             data=self.pdf, 
             x="algorithm", 
-            y="entropy_encrypted",
-            hue="algorithm",        # Add this
+            y="entropy_encrypted",        # Add this
             palette="colorblind",
             legend=False,           # Add this
             color="black",          # Remove this - conflicts with hue
@@ -420,7 +408,7 @@ class PlotGenerator:
     def entropy_ecdf(self):
         """Empirical cumulative distribution of encrypted entropy."""
         plt.figure(figsize=(8, 6))
-        sns.ecdfplot(data=self.pdf, x="entropy_encrypted", hue="algorithm")
+        sns.ecdfplot(data=self.pdf, x="entropy_encrypted")
         plt.axvline(8.0, color='black', linestyle='--', linewidth=1.2,
                     label='Ideal cipher (8 bits)')
         plt.title("ECDF of Encrypted Entropy by Algorithm")
@@ -484,7 +472,7 @@ class PlotGenerator:
         ).reset_index()
         sns.scatterplot(
             data=summary, x="mean_time", y="mean_entropy",
-            hue="algorithm", style="algorithm", s=100
+             style="algorithm", s=100
         )
         plt.axhline(8.0, color='gray', linestyle='--', label='Theoretical maximum')
         plt.title("Encryption Time vs Mean Entropy per Algorithm")
@@ -508,7 +496,7 @@ class PlotGenerator:
         sns.boxplot(data=self.pdf, x="algorithm", y="entropy_encrypted", ax=axes[0,1])
         axes[0,1].set_title("Encrypted Entropy by Algorithm")
         # ECDF
-        sns.ecdfplot(data=self.pdf, x="entropy_encrypted", hue="algorithm", ax=axes[1,0])
+        sns.ecdfplot(data=self.pdf, x="entropy_encrypted", ax=axes[1,0])
         axes[1,0].axvline(8, ls='--', color='black')
         axes[1,0].set_title("Cumulative Distribution (ECDF)")
         # Error barplot

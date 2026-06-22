@@ -9,8 +9,6 @@ numpy==2.4.6
 packaging==26.2
 pandas==3.0.3
 pillow==12.2.0
-polars==1.41.2
-polars-runtime-32==1.41.2
 pycparser==3.0
 pycryptodome==3.23.0
 pyparsing==3.3.2
