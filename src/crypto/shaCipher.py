@@ -9,11 +9,3 @@ def sha256_file(file_path):
             sha256.update(chunk)
 
     return sha256.hexdigest()
-
-
-# Example usage
-"""file_path = "steam.dmg"
-result_hash = sha256_file(file_path)
-
-print("SHA-256:", result_hash)
-"""

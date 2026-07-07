@@ -192,39 +192,3 @@ class DES:
         """Read IV of file with DES Cipher (8 bytes)"""
         with open(path, "rb") as f:
             return f.read(8)
-
-
-# ─── Fast Demo ──────────────────────────────────────────────────────────────
-
-#if __name__ == "__main__":
-    #des = DES()
-
-    # Asignar clave manualmente (igual que el comentario original)
-    #des.set_key(bytes.fromhex("4a6f3135514a6257"))
-    #print(f"Clave  : {des.KEY.hex()}")
-
-    # Round-trip CBC
-    #iv      = os.urandom(8)
-    #mensaje = b"Hola, mundo DES en C!"
-    #cifrado = des.desEncryptCBC(mensaje, des.KEY, iv)
-    #claro   = des.desDecryptCBC(cifrado, des.KEY, iv)
-    #assert claro == mensaje, "Fallo en round-trip CBC"
-    #print(f"IV: {iv.hex()}")
-    #print(f"Cifrado: {cifrado.hex()}")
-    #print(f"Claro  : {claro.decode()}")
-    #print("Round-trip CBC: OK")
-
-    # Prueba de archivos (descomenta si tienes 'hola.txt')
-    #des.encrypt_file("steam.dmg")
-    # Uso
-    #iv = des.reaad_iv_file("steam.dmg.enc")
-    #iv_hex = iv.hex()   # guardas esto en tu BD: "a3f1c2d4e5f6a7b8"
-    #des.set_key(bytes.fromhex("4a6f3135514a6257"))
-
-    # Recuperas el iv_hex de tu BD y lo conviertes de nuevo a bytes
-    #iv = bytes.fromhex(iv_hex)   # "a3f1c2d4e5f6a7b8" → b'\xa3\xf1...'
-
-    #des.descifrar_archivo("documento.txt.enc")
-    # El IV ya está dentro del .enc, descifrar_archivo lo lee solo
-    #print(iv.hex())
-    #des.decrypt_file("steam.dmg.enc")

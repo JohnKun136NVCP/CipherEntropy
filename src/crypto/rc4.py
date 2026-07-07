@@ -31,17 +31,3 @@ def rc4_file(infile: str, outfile: str, key: bytes):
 
     if result != 0:
         raise RuntimeError("Error al procesar RC4")
-
-"""
-key = generateTokenCiphers("RC4")
-print(key.hex())
-
-rc4_file("steam.dmg", "Steam.enc", key)
-rc4_file("Steam.enc", "Steam_r.dmg", key)
-
-
-with open("hola.enc", "rb") as f:
-    encrypted_data = f.read()
-
-print(encrypted_data.hex())
-"""
