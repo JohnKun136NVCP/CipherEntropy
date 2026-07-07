@@ -117,9 +117,7 @@ def run_once(file_path:str,cipher:str, run_id:int):
         "sha_raw": sha_raw,
         "sha_encrypted": sha_enc
     }
-
-
-def run(conf):
+def run_cipher_algorithm(conf:dict):
     ds = Dataset()
     ds.init_files()
     files_ = get_files(conf["savedData"])
@@ -128,7 +126,6 @@ def run(conf):
     else:
         algorithms =  [conf["algo"]]
     experiment_id = 1
-    
     for algorithm in algorithms:
         for loop_id in range(conf["loops"]):
             for file_path in files_:
@@ -158,9 +155,13 @@ def run(conf):
                     "" if result["iv"] is None else result["iv"].hex()
                ])
                 experiment_id +=1
+
+def run(conf):
+    if not conf["onplots"]:
+        run_cipher_algorithm(conf)
+    
     plots = PlotGenerator(
         csv_file="data/csv/global.csv",
         output_dir=conf["savedPlot"]
     )
-    plots.generate_all()
-  
+    plots.generate_all()  

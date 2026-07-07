@@ -27,6 +27,13 @@ class PlotGenerator:
 
 
         self.pdf = self.df.copy()
+        # Extensions 
+        self.pdf["extension"] = (
+            self.pdf["file_name"]
+            .str.split(".")
+            .str[-1]
+            .str.lower()
+        )
        
     def entropy_histogram(self):
         plt.figure(figsize=(10, 6))
@@ -106,6 +113,42 @@ class PlotGenerator:
         )
 
         plt.close()
+    def entropy_delta_boxplot(self):
+
+        plt.figure(figsize=(8,6))
+
+        sns.boxplot(
+            data=self.pdf,
+            x="algorithm",
+            y="entropy_delta",
+            palette="colorblind"
+        )
+
+        sns.stripplot(
+            data=self.pdf,
+            x="algorithm",
+            y="entropy_delta",
+            color="black",
+            alpha=.25,
+            size=2
+        )
+
+        plt.ylabel("Entropy Gain (bits)")
+        plt.xlabel("Algorithm")
+        plt.title("Entropy Gain by Encryption Algorithm")
+
+        plt.tight_layout()
+
+        plt.savefig(
+            self.output_dir/"entropy_delta_boxplot.png",
+            dpi=300
+        )
+
+        plt.savefig(
+            self.output_dir/"entropy_delta_boxplot.pdf"
+        )
+
+        plt.close()
     def decryption_times(self):
 
         plt.figure(figsize=(8, 6))
@@ -175,7 +218,199 @@ class PlotGenerator:
         )
 
         return stats
+    def before_after_entropy(self):
 
+        plt.figure(figsize=(7,7))
+
+        sns.scatterplot(
+            data=self.pdf,
+            x="entropy_raw",
+            y="entropy_encrypted",
+            hue="algorithm",
+            alpha=.55
+        )
+
+        plt.plot(
+            [0,8],
+            [0,8],
+            "--",
+            color="black",
+            linewidth=1,
+            label="No entropy change"
+        )
+
+        plt.xlim(0,8.05)
+        plt.ylim(0,8.05)
+
+        plt.xlabel("Original Entropy")
+        plt.ylabel("Encrypted Entropy")
+
+        plt.title("Entropy Before and After Encryption")
+
+        plt.legend()
+
+        plt.tight_layout()
+
+        plt.savefig(
+            self.output_dir/"before_after_entropy.png",
+            dpi=300
+        )
+
+        plt.savefig(
+            self.output_dir/"before_after_entropy.pdf"
+        )
+
+        plt.close()
+    def entropy_delta_extension(self):
+
+        plt.figure(figsize=(12,6))
+
+        sns.boxplot(
+            data=self.pdf,
+            x="extension",
+            y="entropy_delta",
+            palette="colorblind"
+        )
+
+        plt.xticks(rotation=45)
+
+        plt.ylabel("Entropy Gain")
+
+        plt.tight_layout()
+
+        plt.savefig(
+            self.output_dir/"entropy_delta_extension.png",
+            dpi=300
+        )
+
+        plt.savefig(
+            self.output_dir/"entropy_delta_extension.pdf"
+        )
+
+        plt.close()
+    def extension_statistics(self):
+
+        stats = (
+
+            self.pdf
+
+            .groupby("extension")
+
+            .agg(
+
+                files=("extension","count"),
+
+                mean_raw=("entropy_raw","mean"),
+
+                mean_enc=("entropy_encrypted","mean"),
+
+                mean_delta=("entropy_delta","mean"),
+
+                std_delta=("entropy_delta","std")
+
+            )
+
+            .reset_index()
+
+        )
+
+        stats.to_csv(
+
+            self.output_dir/
+
+            "extension_statistics.csv",
+
+            index=False
+
+        )
+
+        return stats
+    def entropy_delta_ecdf(self):
+
+        plt.figure(figsize=(8,6))
+
+        sns.ecdfplot(
+
+            data=self.pdf,
+
+            x="entropy_delta"
+
+        )
+
+        plt.xlabel("Entropy Gain")
+
+        plt.ylabel("Cumulative Probability")
+
+        plt.title("ECDF of Entropy Gain")
+
+        plt.tight_layout()
+
+        plt.savefig(
+
+            self.output_dir/
+
+            "entropy_delta_ecdf.png",
+
+            dpi=300
+
+        )
+
+        plt.savefig(
+
+            self.output_dir/
+
+            "entropy_delta_ecdf.pdf"
+
+        )
+
+        plt.close()
+    def entropy_summary(self):
+
+        summary = pd.DataFrame({
+
+            "Metric":[
+
+                "Mean original entropy",
+
+                "Mean encrypted entropy",
+
+                "Mean entropy gain",
+
+                "Median entropy gain",
+
+                "Maximum entropy gain",
+
+                "Minimum entropy gain"
+
+            ],
+
+            "Value":[
+
+                self.pdf.entropy_raw.mean(),
+
+                self.pdf.entropy_encrypted.mean(),
+
+                self.pdf.entropy_delta.mean(),
+
+                self.pdf.entropy_delta.median(),
+
+                self.pdf.entropy_delta.max(),
+
+                self.pdf.entropy_delta.min()
+
+            ]
+
+        })
+
+        summary.to_csv(
+
+            self.output_dir/
+
+            "entropy_summary.csv",
+
+            index=False
+
+        )
     def wilcoxon_test(self):
 
         stat, pvalue = wilcoxon(
@@ -267,6 +502,51 @@ class PlotGenerator:
         plt.savefig(
             self.output_dir / "entropy_error.png",
             dpi=300
+        )
+
+        plt.close()
+    def entropy_delta_vs_time(self):
+
+        plt.figure(figsize=(8,6))
+
+        sns.scatterplot(
+
+            data=self.pdf,
+
+            x="encrypt_time_ms",
+
+            y="entropy_delta",
+
+            hue="algorithm",
+
+            alpha=.6
+
+        )
+
+        plt.xlabel("Encryption Time (ms)")
+
+        plt.ylabel("Entropy Gain")
+
+        plt.title("Entropy Gain versus Encryption Time")
+
+        plt.tight_layout()
+
+        plt.savefig(
+
+            self.output_dir/
+
+            "entropy_delta_vs_time.png",
+
+            dpi=300
+
+        )
+
+        plt.savefig(
+
+            self.output_dir/
+
+            "entropy_delta_vs_time.pdf"
+
         )
 
         plt.close()
@@ -520,12 +800,16 @@ class PlotGenerator:
             stat, p = wilcoxon(subset["entropy_raw"], subset["entropy_encrypted"])
             # Effect size: rank-biserial correlation
             diff = subset["entropy_encrypted"] - subset["entropy_raw"]
-            r = stat / np.sum(np.abs(diff)) if np.sum(np.abs(diff)) != 0 else np.nan
+            #r = stat / np.sum(np.abs(diff)) if np.sum(np.abs(diff)) != 0 else np.nan
             results.append({
                 "algorithm": alg,
                 "wilcoxon_stat": stat,
                 "p_value": p,
-                "effect_size_r": r
+                "median_delta": np.median(
+                    subset["entropy_delta"]
+                ),
+                "mean_delta": subset["entropy_delta"].mean(),
+                "std_delta": subset["entropy_delta"].std()
             })
         results_df = pd.DataFrame(results)
         # Bonferroni correction
@@ -555,6 +839,13 @@ class PlotGenerator:
     def generate_all(self):
         self.entropy_histogram()
         self.entropy_boxplot()            # now with significance bars
+        self.before_after_entropy()
+        self.entropy_delta_boxplot()
+        self.entropy_delta_extension()
+        self.entropy_delta_vs_time()
+        self.entropy_delta_ecdf()
+        self.extension_statistics()
+        self.entropy_summary()
         self.entropy_violin_advanced()
         self.entropy_delta()
         self.encryption_times()

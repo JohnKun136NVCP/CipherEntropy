@@ -11,7 +11,8 @@ def load_config():
         "algo": "All",
         "show": True,
         "savedData": str(ROOT/"data"),
-        "savedPlot": str(ROOT/"data"/"plots")
+        "savedPlot": str(ROOT/"data"/"plots"),
+        "onplots": False
     }
     if CONFIG_FILE.exists():
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
@@ -49,8 +50,8 @@ def main():
     parser.add_argument("-sd", metavar="Directory", help="Change directory of data",type=str,default=current_config["savedData"])
     parser.add_argument("-sp", metavar="Directory", help="Change directory of plots",type=str, default=current_config["savedPlot"])
     parser.add_argument("-rc", metavar="True/False", help="Reset default configuration on config.json", type=bool, default=False)
+    parser.add_argument("-op", help="Only plots default data", action="store_true")
     parser.add_argument("-r", help="Run program", action="store_true")
-
     args = parser.parse_args()
     if not args.rc:
         final_loops = args.n if args.n else current_config["loops"]
@@ -63,7 +64,8 @@ def main():
             "algo":final_algo,
             "show":final_prompt,
             "savedData":final_datap,
-            "savedPlot":final_plotp
+            "savedPlot":final_plotp,
+            "onplots":args.op
         }
         save_config(runtime_config)
         current_config = runtime_config
@@ -73,7 +75,8 @@ def main():
             "algo": "All",
             "show": True,
             "savedData": str(ROOT/"data"),
-            "savedPlot": str(ROOT/"data"/"plots")
+            "savedPlot": str(ROOT/"data"/"plots"),
+            "onplots": False
         }
         save_config(defaults)
         current_config = defaults
