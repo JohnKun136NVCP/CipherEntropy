@@ -2,6 +2,10 @@
 
 ![CipherEntropy Logo](img/frieren_ascii.png)
 
+Created by [JohnKun136NVCP](https://github.com/JohnKun136NVCP)
+
+Project to get my balchor degree on physics and computer science, and to learn more about cryptography and entropy analysis.
+
 ## Project Overview
 
 CipherEntropy is a cryptographic tool designed to analyze and measure the entropy of encrypted data. It provides comprehensive CLI configurations and execution options for security researchers, cryptographers, and developers who need to evaluate the randomness and cryptographic strength of cipher outputs.
@@ -34,45 +38,31 @@ cipherentropy --input <file> --output <file>
 
 #### Input/Output Options
 
-- `--input`, `-i` - Input file path containing data to analyze
-- `--output`, `-o` - Output file path for results (default: stdout)
-- `--format`, `-f` - Output format: `json`, `csv`, `text` (default: text)
+- `-n`, Run with n loops (default: 1)
+- `-al`, Run with specific algorithm (default: all)
+- `-i`, Show or hide prompt (default: show)
+- `-sd`, Change directory of data (default: ./data)
+- `-sp`, Change directory of plots (default: ./data/plots)
+- `-rc`, Reset default configuration on config.json (default: False)
+- `-op`, Only plots default data (default: False)
+- `-r`, Run program (default: False)
 
-#### Cipher Options
 
-- `--cipher`, `-c` - Cipher algorithm: `aes`, `des`, `rsa`, `chacha20` (default: aes)
-- `--key-size` - Key size in bits (default: 256)
-- `--algorithm`, `-a` - Specific algorithm variant
-
-#### Analysis Options
-
-- `--entropy-type` - Type of entropy calculation: `shannon`, `renyi`, `min-entropy` (default: shannon)
-- `--block-size`, `-b` - Block size for analysis in bytes (default: 16)
-- `--verbose`, `-v` - Enable verbose output
-- `--statistical` - Include detailed statistical analysis
-
-#### Advanced Options
-
-- `--threads`, `-t` - Number of parallel processing threads (default: auto)
-- `--iterations` - Number of iterations for entropy calculation (default: 1000)
-- `--confidence-level` - Statistical confidence level (0-1, default: 0.95)
-- `--help`, `-h` - Display help information
-- `--version` - Display version information
 
 ## Example Commands
 
+For example, you can run the following commands to analyze encrypted files:
+
 ```bash
 # Basic entropy analysis
-cipherentropy --input data.bin --cipher aes
+python3 main.py -n 1000 -al aes -r
 
-# Detailed statistical analysis with CSV output
-cipherentropy -i encrypted.bin -o results.csv --format csv --statistical
+# With specific input and output files
+python3 main.py -i input.txt -sp /home/user/plots -r
 
-# Custom cipher and entropy type
-cipherentropy --input data.txt --cipher chacha20 --entropy-type renyi --verbose
+# If you want to reset the configuration to default
+python3 main.py -rc True
 
-# Process with multiple threads
-cipherentropy -i large_file.bin -t 8 --iterations 5000
 ```
 
 ## Hex Representation
@@ -90,22 +80,16 @@ Values range from 0 to 8 (for 8-bit data):
 - **2-6**: Moderate entropy (acceptable encryption)
 - **6-8**: High entropy (strong encryption, good randomness)
 
-### Output Example
+### Configuration Example
 
 ```json
 {
-  "file": "encrypted.bin",
-  "cipher": "aes",
-  "entropy": 7.94,
-  "entropy_type": "shannon",
-  "block_size": 16,
-  "total_blocks": 1024,
-  "statistics": {
-    "mean": 7.94,
-    "std_dev": 0.08,
-    "min": 7.65,
-    "max": 8.00
-  }
+  "loops": 1,
+  "algo": "All",
+  "show": true,
+  "savedData": "/path/to/data",
+  "savedPlot": "/path/to/plots",
+  "onplots": false
 }
 ```
 
@@ -114,6 +98,10 @@ Values range from 0 to 8 (for 8-bit data):
 - Python 3.8+ or Node.js 14+
 - OpenSSL library
 - NumPy (for statistical calculations)
+- Matplotlib (for plotting results)
+- SciPy (for advanced statistical analysis)
+- Pandas (for data manipulation)
+
 
 ## License
 
@@ -125,7 +113,7 @@ Contributions are welcome! Please submit pull requests or issues to the project 
 
 ## Support
 
-For issues, questions, or suggestions, please open an issue on the project repository.
+For issues, questions, or suggestions, please open an issue on the project repository. Connect with the telegram that is available on my github profile.
 
 ## Makefile Compilation
 
